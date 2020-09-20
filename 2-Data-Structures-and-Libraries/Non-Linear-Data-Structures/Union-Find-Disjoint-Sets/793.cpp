@@ -11,71 +11,111 @@ typedef vector<int> vi;
 #define pb push_back
 #define mk make_pair
 
+#define si(a) scanf("%d", &a);
+#define pi(a) printf("%d", a);
+
+#define sl(a) scanf("%lld", &a);
+#define pl(a) printf("%lld ", a);
+
+#define sc(a) scanf("%c", &a);
+#define pc(a) printf("%c ", a);
+
+#define ss(a) scanf("%s", s);
+#define ps(a) printf("%s ", s);
+
 #define flu(i, s, e) for(int i = s; i < e; i++)
 #define fld(i, s, e) for(int i = s; i >= e; i--)
 
-vi P,R,S;
+class UnionFind
+{
+public:
+    vi p, r;
 
-int N;
-
-void inicializar(int n){
-    N=n;
-    R.assign(N,0);
-    S.assign(N,1);
-    P.assign(N,0);
-    for(int i=0;i<N;i++)
-        P[i]=i;
-}
-int findSet(int x){
-    return x==P[x]?x:P[x]=findSet(P[x]);
-}
-int isSameSet(int x, int y){
-    return findSet(x)==findSet(y)?1:0;
-}
-void unionSet(int x, int y){
-    if(!isSameSet(x,y)){
-        int p1=findSet(x);
-        int p2=findSet(y);
-        N--;
-        if(R[p1]>R[p2]){
-            P[p2]=p1;
-            S[p1]+=S[p2];
-        }
-        else{
-            P[p1]=p2;
-            S[p2]+=S[p1];
-            if(R[p1]==R[p2])
-                R[p2]++;
-        }
+    void init(int n)
+    { 
+        r.reserve(n + 1);
+        p.reserve(n + 1);
+        for(int i = 0; i <= n; i++) p[i] = i , r[i] = 1;
+            return;
     }
-}
 
-int c,i;
-int t,n;
-char op,op2;
+    int findSet(int x)
+    { 
+        if(p[x] == x) return x; 
+        return p[x] = findSet(p[x]);
+    }
 
-int main(){
-    int x,y;
-    scanf("%d",&t);
-    while(t--){
-        scanf("%d\n",&n);
-        inicializar(n);
+    bool isSameSet(int a, int b)
+    {
+        return (findSet(a) == findSet(b));
+    }
 
-        while((op=getchar())!=EOF && op!='\n'){
-            scanf("%d %d",&x,&y);
+    void unionSet(int x, int y)
+    {
+        if(!isSameSet(x, y))
+        {
+            x = findSet(x); y = findSet(y);
+            if(r[x] >= r[y]) p[y] = x , r[x] += r[y];
+            else p[x] = y , r[y] += r[x];
+        }
+        return;
+    }
+
+    int numDisjointSets(int n)
+    {
+        int count = 0;
+        for(int i = 1; i <= n; i++)
+        {
+            p[i] = findSet(i);
+            if(p[i] == i) count++;
+        }
+        return count;
+    }
+
+    int sizeOfSet(int x)
+    {
+        return r[findSet(p[x])];
+    }
+};
+
+int32_t main()
+{
+    // fast;
+    // freopen("input.txt", "r", stdin);
+    // freopen("myoutput.txt", "w", stdout);
+
+    UnionFind dsu;
+    int t, a, b, n, corr, incorr;
+    char c;
+    si(t);
+
+    while(t--)
+    {
+        si(n);
+        dsu.init(n);
+        corr = incorr = 0;
+        
+        getchar();
+        while((c = getchar()) != EOF && c != '\n')
+        {
+            si(a); si(b);
             getchar();
-            if(op=='c')
-                unionSet(x-1,y-1);
+            if(c == 'c')
+            {
+                dsu.unionSet(a, b);
+            }
             else
-                isSameSet(x-1,y-1)==1?c++:i++;
-
+            {
+                dsu.isSameSet(a, b) == 1 ? corr++ : incorr++;
+            }
         }
-        printf("%d,%d\n",c,i);
-        if(t)
-            printf("\n");
-        c = i = 0;
 
+        pi(corr);
+        printf(",");
+        pi(incorr);
+        printf("\n");
+        if(t) printf("\n");
     }
-    return 0;
 
+    return 0;
 }
